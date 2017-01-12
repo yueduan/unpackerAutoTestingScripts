@@ -7,7 +7,7 @@ packageName=$(/home/yduan/yueduan/android-5.0.0_r3/out/host/linux-x86/bin/aapt d
 
 if [ "$launch" = "1" ]
 then
-	adb shell monkey -p $(/home/yduan/yueduan/android-5.0.0_r3/out/host/linux-x86/bin/aapt dump badging $apk | awk -v FS="'" '/package: name=/{print $2}') -c android.intent.category.LAUNCHER 1
+	adb shell monkey -p $packageName -c android.intent.category.LAUNCHER 1
 elif [ "$launch" = "2" ]
 then
 	adb shell ps | grep $packageName | awk '{print $2}' | xargs adb shell kill

@@ -88,6 +88,7 @@ def main():
 				cmd = "/launch_KillApp.sh {} 1".format(file_path)
 				proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_launch.communicate()
+				print output
 					
 				# let the app execute for certain time
 				time.sleep(EXECUTION_TIME)
