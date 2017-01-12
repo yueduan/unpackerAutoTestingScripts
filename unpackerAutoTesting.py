@@ -12,6 +12,8 @@ KERNEL_FILE_PATH = "/home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/gold
 PLUGIN_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/libunpacker.so"
 APP_PATH = "/test_apps/"
 
+EXECUTION_TIME = 20
+
 ###CONFIG END#####
 
 def input_cmd(p, cmd): 
@@ -67,17 +69,17 @@ def main():
 			for filename in filenames:
 				file_path = os.path.join(dirname, filename)
 				print "Installing: " + file_path
-				cmd = "/install_uninstall.sh file_path 1"
+				cmd = "/install_uninstall.sh {} 1".format(file_path)
 				proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				proc_install.wait()
-    	
+    				(output, err) = proc_install.communicate()
+				print output
+					
 				# after installation, load the plugin
 				print "Loading plugin"
  				input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
 
 				# get package name of the app and hook the process
 				out = subprocess.check_output(['/getPackageNameFromApk.sh',file_path])
-				print out				
 				cmd = "do_hookapitests {}".format(out)
 				input_cmd(p, cmd)
 		
@@ -85,10 +87,11 @@ def main():
 				print "Launching the app"
 				cmd = "/launch_KillApp.sh {} 1".format(file_path)
 				proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				proc_launch.wait()
-
-				# let the app execute
-				time.sleep(20)
+				(output, err) = proc_launch.communicate()
+					
+				input_cmd(p,"ps")
+				# let the app execute for certain time
+				time.sleep(EXECUTION_TIME)
 
 				# unload the plugin and uninstall the app
 				print "unloading plugin"
@@ -96,10 +99,10 @@ def main():
 		
 				# clean up the app
 				print "Uninstalling: " + file_path
-				cmd = "/install_uninstall.sh file_path 2"
-				proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				proc_uninstall.wait()
-
+				cmd = "/install_uninstall.sh {} 2".format(file_path)
+				proc_uninstall = subprocess.call(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				(output, err) = proc_uninstall.communicate()
+				print output
 	except IOError as e:
 		print "I/O error({0}): {1}".format(e.errno, e.strerror)
 	except:
