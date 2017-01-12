@@ -30,8 +30,9 @@ def cleanDir(path):
 def moveAllFiles(pathSrc, pathDst):
 	for root, dirs, files in os.walk(pathSrc):
 		for f in files:
-			file_path = os.path.join(root, f)
-			os.rename(file_path, os.path.join(pathDst,f))
+			src = os.path.join(pathSrc, f)
+			dst = os.path.join(pathDst, f)
+			os.rename(src, dst)
 
 def input_cmd(p, cmd): 
 	if not cmd.endswith("\n"): 
@@ -72,15 +73,21 @@ def wait_start(proc):
 def main():
 	cleanDir(RESULT_PATH)
 	try:
-		# start droidscope   
-		p = subprocess.Popen(args="sudo /home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/objs/emulator -no-audio -no-window -partition-size 1000 -sysdir /home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic -kernel /home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage -memory 2048 -qemu -monitor stdio", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
- 		fl = fcntl.fcntl(p.stdout, fcntl.F_GETFL)
- 		fcntl.fcntl(p.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
- 		time.sleep(5)
+
+		pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
+        	if not 'emulator' in pl:
+			# start droidscope   
+			p = subprocess.Popen(args="sudo /home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/objs/emulator -no-audio -no-window -partition-size 1000 -sysdir /home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic -kernel /home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage -memory 2048 -qemu -monitor stdio", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+ 			fl = fcntl.fcntl(p.stdout, fcntl.F_GETFL)
+ 			fcntl.fcntl(p.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+ 			time.sleep(5)
 	
-		# wait for the emulator to fully start
-	 	input_cmd(p, "ps")
-	 	wait_start(p)
+			# wait for the emulator to fully start
+	 		input_cmd(p, "ps")
+	 		wait_start(p)
+		else:
+			print 'kill existing emulator first!'
+			return
 	
 		# go over every file in APP_PATH, install the app, run it in emulator to analyze and then uninstall the app
 	 	for dirname, dirnames, filenames in os.walk(APP_PATH):
