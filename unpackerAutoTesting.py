@@ -3,18 +3,35 @@ import fcntl
 import time
 import binascii
 import sys
+import shutil
 
 ###CONFIG BEGIN###
 
-EMULATOR_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate"
+EMULATOR_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/"
 SYS_DIR_PATH = "/home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic"
 KERNEL_FILE_PATH = "/home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage"
 PLUGIN_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/libunpacker.so"
+RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/out/"
 APP_PATH = "/test_apps/"
 
 EXECUTION_TIME = 20
 
 ###CONFIG END#####
+
+# Given one directory, delete all its files and subdirectories
+def cleanDir(path):
+	for root, dirs, files in os.walk(path):
+		for f in files:
+			os.unlink(os.path.join(root, f))
+		for d in dirs:
+ 			shutil.rmtree(os.path.join(root, d))
+
+# Move all the files from directory 'pathSrc' to directory 'pathDst'
+def moveAllFiles(pathSrc, pathDst):
+	for root, dirs, files in os.walk(pathSrc):
+		for f in files:
+			file_path = os.path.join(root, f)
+			os.rename(file_path, os.path.join(pathDst,f))
 
 def input_cmd(p, cmd): 
 	if not cmd.endswith("\n"): 
@@ -53,6 +70,7 @@ def wait_start(proc):
 
 
 def main():
+	cleanDir(RESULT_PATH)
 	try:
 		# start droidscope   
 		p = subprocess.Popen(args="sudo /home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/objs/emulator -no-audio -no-window -partition-size 1000 -sysdir /home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic -kernel /home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage -memory 2048 -qemu -monitor stdio", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
@@ -79,10 +97,10 @@ def main():
  				input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
 
 				# get package name of the app and hook the process
-				out = subprocess.check_output(['/getPackageNameFromApk.sh',file_path])
-				cmd = "do_hookapitests {}".format(out)
+				packageName = subprocess.check_output(['/getPackageNameFromApk.sh',file_path])
+				cmd = "do_hookapitests {}".format(packageName)
 				input_cmd(p, cmd)
-		
+
 				# launch the app
 				print "Launching the app"
 				cmd = "/launch_KillApp.sh {} 1".format(file_path)
@@ -103,6 +121,13 @@ def main():
 				proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_uninstall.communicate()
 				print output
+
+				# move the result files into a specific folder
+				result_path_new = RESULT_PATH + packageName
+				os.mkdir(result_path_new)
+				moveAllFiles(RESULT_PATH, result_path_new)
+				
+				
 	except IOError as e:
 		print "I/O error({0}): {1}".format(e.errno, e.strerror)
 	except:
