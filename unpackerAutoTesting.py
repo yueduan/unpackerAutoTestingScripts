@@ -100,7 +100,7 @@ def main():
 				# clean up the app
 				print "Uninstalling: " + file_path
 				cmd = "/install_uninstall.sh {} 2".format(file_path)
-				proc_uninstall = subprocess.call(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_uninstall.communicate()
 				print output
 	except IOError as e:
