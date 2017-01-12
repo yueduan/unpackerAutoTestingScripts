@@ -123,7 +123,7 @@ def main():
 				print output
 
 				# move the result files into a specific folder
-				result_path_new = RESULT_PATH + packageName
+				result_path_new = RESULT_PATH + filename
 				os.mkdir(result_path_new)
 				moveAllFiles(RESULT_PATH, result_path_new)
 				
