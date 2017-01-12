@@ -89,7 +89,6 @@ def main():
 				proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_launch.communicate()
 					
-				input_cmd(p,"ps")
 				# let the app execute for certain time
 				time.sleep(EXECUTION_TIME)
 
