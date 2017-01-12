@@ -11,7 +11,8 @@ EMULATOR_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_al
 SYS_DIR_PATH = "/home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic"
 KERNEL_FILE_PATH = "/home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage"
 PLUGIN_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/libunpacker.so"
-RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/out/"
+TEMP_RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/out/"
+RESULT_PATH = "/results/"
 APP_PATH = "/test_apps/"
 
 EXECUTION_TIME = 20
@@ -132,7 +133,7 @@ def main():
 				# move the result files into a specific folder
 				result_path_new = RESULT_PATH + filename
 				os.mkdir(result_path_new)
-				moveAllFiles(RESULT_PATH, result_path_new)
+				moveAllFiles(TEMP_RESULT_PATH, result_path_new)
 				
 				
 	except IOError as e:
