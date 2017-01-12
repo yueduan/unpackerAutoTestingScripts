@@ -14,6 +14,6 @@ then
 elif [ "$install" = "2" ]
 then
 	#echo uninstalling $filename
-	packageName=$(aapt dump badging $file | awk -v FS="'" '/package: name=/{print $2}')
+	packageName=$(/home/yduan/yueduan/android-5.0.0_r3/out/host/linux-x86/bin/aapt dump badging $apk | awk -v FS="'" '/package: name=/{print $2}')
 	adb shell pm uninstall -k $packageName
 fi
