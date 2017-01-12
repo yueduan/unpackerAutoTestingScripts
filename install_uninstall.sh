@@ -1,16 +1,15 @@
 #!/bin/bash
 
-file=$1
+apk=$1
 install=$2
 
-filename=$(basename $file)
 
 if [ "$install" = "1" ] 
 then
 	#echo installing $filename
 	adb shell setprop dalvik.vm.dex2oat-filter "interpret-only"
 	adb shell setprop dalvik.vm.image-dex2oat-filter "interpret-only"
-	adb install $file
+	adb install $apk
 elif [ "$install" = "2" ]
 then
 	#echo uninstalling $filename
