@@ -58,7 +58,7 @@ def wait_start(proc):
 	proc.stdin.write("ps\n")
 	proc.stdin.write("MARK\n")
 	while True:
-		time.sleep(0.1)
+		time.sleep(5)
 		try:    
 			s = proc.stdout.read()
 		except Exception, e:
