@@ -10,6 +10,8 @@ import shutil
 EMULATOR_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/"
 SYS_DIR_PATH = "/home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic"
 KERNEL_FILE_PATH = "/home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage"
+SYS_DIR_SRC_PATH = "/androidSysImages/"
+
 PLUGIN_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/libunpacker.so"
 TEMP_RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/DECAF_plugins/old_dex_extarctor/out/"
 RESULT_PATH = "/results/"
@@ -18,6 +20,7 @@ APP_PATH = "/test_apps/"
 EXECUTION_TIME = 20
 
 ###CONFIG END#####
+
 
 # Given one directory, delete all its files and subdirectories
 def cleanDir(path):
@@ -77,6 +80,10 @@ def main():
 
 		pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
         	if not 'emulator' in pl:
+		
+			# move all system image files to the destination folder in order to run multiple docker containers in parallel
+			moveAllFiles(SYS_DIR_SRC_PATH, SYS_DIR_PATH)
+
 			# start droidscope   
 			p = subprocess.Popen(args="sudo /home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/objs/emulator -no-audio -no-window -partition-size 1000 -sysdir /home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic -kernel /home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage -memory 2048 -qemu -monitor stdio", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
  			fl = fcntl.fcntl(p.stdout, fcntl.F_GETFL)
@@ -89,7 +96,8 @@ def main():
 		else:
 			print 'kill existing emulator first!'
 			return
-	
+
+
 		# go over every file in APP_PATH, install the app, run it in emulator to analyze and then uninstall the app
 	 	for dirname, dirnames, filenames in os.walk(APP_PATH):
 			for filename in filenames:
