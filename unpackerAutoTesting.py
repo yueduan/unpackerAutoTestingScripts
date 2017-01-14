@@ -121,7 +121,7 @@ def main():
 				proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     				(output, err) = proc_install.communicate()
 				print output
-					
+				
 				# after installation, load the plugin
  				input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
 
@@ -153,6 +153,9 @@ def main():
 				(output, err) = proc_uninstall.communicate()
 				print output
 
+				# delete apk file
+				os.remove(file_path)	
+				
 				# move the result files into a specific folder
 				result_path_new = RESULT_PATH + filename
 				os.mkdir(result_path_new)
