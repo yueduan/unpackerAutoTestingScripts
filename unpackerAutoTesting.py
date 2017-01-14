@@ -17,7 +17,7 @@ TEMP_RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art
 RESULT_PATH = "/results/"
 APP_PATH = "/test_apps/"
 
-EXECUTION_TIME = 20
+EXECUTION_TIME = 500
 
 ###CONFIG END#####
 
@@ -74,10 +74,25 @@ def wait_start(proc):
 
 
 
+def checkProcess(proc, name):
+	proc.stdin.write("ps\n")
+	proc.stdin.write("MARK\n")
+	time.sleep(1)
+
+	try:
+		s = proc.stdout.read()
+	except Exception, e:
+		return 0
+	if "unknown command: 'MARK'" in s:
+		if name in s:
+			return 1
+	return 0
+
+
+
 def main():
 	cleanDir(RESULT_PATH)
 	try:
-
 		pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
         	if not 'emulator' in pl:
 		
@@ -96,7 +111,6 @@ def main():
 		else:
 			print 'kill existing emulator first!'
 			return
-
 
 		# go over every file in APP_PATH, install the app, run it in emulator to analyze and then uninstall the app
 	 	for dirname, dirnames, filenames in os.walk(APP_PATH):
@@ -123,9 +137,12 @@ def main():
 				proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_launch.communicate()
 				print output
-					
+	
+				check_ret = checkProcess(p, packageName)
+
 				# let the app execute for certain time
-				time.sleep(EXECUTION_TIME)
+				if check_ret == 1:				
+					time.sleep(EXECUTION_TIME)
 
 				# unload the plugin and uninstall the app
 				print "unloading plugin"
