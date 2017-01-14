@@ -138,10 +138,11 @@ def main():
 				proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_launch.communicate()
 				print output
-	
-				check_ret = checkProcess(p, packageName)
 
-				# let the app execute for certain time
+				
+				# let the app execute for certain time if it is successfully launched
+				time.sleep(5)
+				check_ret = checkProcess(p, packageName)
 				if check_ret == 1:				
 					time.sleep(EXECUTION_TIME)
 
