@@ -91,7 +91,7 @@ def checkProcess(proc, name):
 
 
 def main():
-	os.rename("/unpackerAutoTestingScripts/libunpacker.so", PLUGIN_PATH)
+	shutil.copyfile("/unpackerAutoTestingScripts/libunpacker.so", PLUGIN_PATH)
 	cleanDir(RESULT_PATH)
 	try:
 		pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
