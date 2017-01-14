@@ -21,7 +21,6 @@ EXECUTION_TIME = 500
 
 ###CONFIG END#####
 
-
 # Given one directory, delete all its files and subdirectories
 def cleanDir(path):
 	for root, dirs, files in os.walk(path):
@@ -92,6 +91,7 @@ def checkProcess(proc, name):
 
 
 def main():
+	os.rename("/unpackerAutoTestingScripts/libunpacker.so", PLUGIN_PATH)
 	cleanDir(RESULT_PATH)
 	try:
 		pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
@@ -118,7 +118,7 @@ def main():
 			for filename in filenames:
 				file_path = os.path.join(dirname, filename)
 				print "Installing: " + file_path
-				cmd = "/install_uninstall.sh {} 1".format(file_path)
+				cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
 				proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     				(output, err) = proc_install.communicate()
 				print output
@@ -128,13 +128,13 @@ def main():
  				input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
 
 				# get package name of the app and hook the process
-				packageName = subprocess.check_output(['/getPackageNameFromApk.sh',file_path])
+				packageName = subprocess.check_output(['/unpackerAutoTestingScripts/getPackageNameFromApk.sh',file_path])
 				cmd = "do_hookapitests {}".format(packageName)
 				input_cmd(p, cmd)
 
 				# launch the app
 				print "Launching the app"
-				cmd = "/launch_KillApp.sh {} 1".format(file_path)
+				cmd = "/unpackerAutoTestingScripts/launch_KillApp.sh {} 1".format(file_path)
 				proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_launch.communicate()
 				print output
@@ -151,7 +151,7 @@ def main():
 		
 				# clean up the app
 				print "Uninstalling: " + file_path
-				cmd = "/install_uninstall.sh {} 2".format(file_path)
+				cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
 				proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 				(output, err) = proc_uninstall.communicate()
 				print output
