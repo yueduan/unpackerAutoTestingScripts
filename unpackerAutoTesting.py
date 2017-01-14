@@ -74,22 +74,18 @@ def wait_start(proc):
 
 
 def checkProcess(proc, name):
-	print "checking " + name
 	proc.stdin.write("ps\n")
 	proc.stdin.write("MARK\n")
 	time.sleep(1)
 
 	try:
 		s = proc.stdout.read()
-		input_cmd(proc, "ps")
 	except Exception, e:
 		return 0
 	if "unknown command: 'MARK'" in s:
 		if name in s:
 			print "app launched"
 			return 1
-	else:
-		print "not launched"
 	return 0
 
 
@@ -133,6 +129,7 @@ def main():
 
 				# get package name of the app and hook the process
 				packageName = subprocess.check_output(['/unpackerAutoTestingScripts/getPackageNameFromApk.sh',file_path])
+				packageName = packageName[:-1]
 				cmd = "do_hookapitests {}".format(packageName)
 				input_cmd(p, cmd)
 
