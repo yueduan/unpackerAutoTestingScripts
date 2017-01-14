@@ -75,17 +75,16 @@ def wait_start(proc):
 
 def checkProcess(proc, name):
 	proc.stdin.write("ps\n")
-	proc.stdin.write("MARK\n")
 	time.sleep(1)
 
 	try:
 		s = proc.stdout.read()
+		input_cmd(proc, "ps")
 	except Exception, e:
 		return 0
-	if "unknown command: 'MARK'" in s:
-		if name in s:
-			print "app launched"
-			return 1
+	if name in s:
+		print "app launched"
+		return 1
 	return 0
 
 
