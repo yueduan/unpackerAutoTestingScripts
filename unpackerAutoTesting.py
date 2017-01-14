@@ -85,6 +85,7 @@ def checkProcess(proc, name):
 		return 0
 	if "unknown command: 'MARK'" in s:
 		if name in s:
+			print "app launched"
 			return 1
 	return 0
 
