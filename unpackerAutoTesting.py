@@ -93,80 +93,76 @@ def checkProcess(proc, name):
 def main():
 	shutil.copyfile("/unpackerAutoTestingScripts/libunpacker.so", PLUGIN_PATH)
 	cleanDir(RESULT_PATH)
-	try:
-		pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
-        	if not 'emulator' in pl:
-		
-			# move all system image files to the destination folder in order to run multiple docker containers in parallel
-			moveAllFiles(SYS_DIR_SRC_PATH, SYS_DIR_PATH)
-
-			# start droidscope   
-			p = subprocess.Popen(args="sudo /home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/objs/emulator -no-audio -no-window -partition-size 1000 -sysdir /home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic -kernel /home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage -memory 2048 -qemu -monitor stdio", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
- 			fl = fcntl.fcntl(p.stdout, fcntl.F_GETFL)
- 			fcntl.fcntl(p.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
- 			time.sleep(5)
+	while ((os.listdir(APP_PATH) != [])):
+		try:
+			pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
+        		if not 'emulator' in pl:
+			
+				# move all system image files to the destination folder in order to run multiple docker containers in parallel
+				moveAllFiles(SYS_DIR_SRC_PATH, SYS_DIR_PATH)
 	
-			# wait for the emulator to fully start
-	 		input_cmd(p, "ps")
-	 		wait_start(p)
-		else:
-			print 'kill existing emulator first!'
-			return
-
-		# go over every file in APP_PATH, install the app, run it in emulator to analyze and then uninstall the app
-	 	for dirname, dirnames, filenames in os.walk(APP_PATH):
-			for filename in filenames:
-				file_path = os.path.join(dirname, filename)
-				cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
-				proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    				(output, err) = proc_install.communicate()
-				print output
-				
-				# after installation, load the plugin
- 				input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
-
-				# get package name of the app and hook the process
-				packageName = subprocess.check_output(['/unpackerAutoTestingScripts/getPackageNameFromApk.sh',file_path])
-				packageName = packageName[:-1]
-				cmd = "do_hookapitests {}".format(packageName)
-				input_cmd(p, cmd)
-
-				# launch the app
-				cmd = "/unpackerAutoTestingScripts/launch_KillApp.sh {} 1".format(file_path)
-				proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				(output, err) = proc_launch.communicate()
-				print output
-
-				
-				# let the app execute for certain time if it is successfully launched
-				time.sleep(5)
-				check_ret = checkProcess(p, packageName)
-				if check_ret == 1:				
-					time.sleep(EXECUTION_TIME)
-
-				# unload the plugin and uninstall the app
-				input_cmd(p, "unload_plugin")
+				# start droidscope   
+				p = subprocess.Popen(args="sudo /home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art_alternate/objs/emulator -no-audio -no-window -partition-size 1000 -sysdir /home/yduan/yueduan/android-5.0.0_r3/out/target/product/generic -kernel /home/yduan/yueduan/android-5.0.0_r3/android_art_kernel/goldfish/arch/arm/boot/zImage -memory 2048 -qemu -monitor stdio", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+	 			fl = fcntl.fcntl(p.stdout, fcntl.F_GETFL)
+ 				fcntl.fcntl(p.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+ 				time.sleep(5)
 		
-				# clean up the app
-				cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
-				proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-				(output, err) = proc_uninstall.communicate()
-				print output
+				# wait for the emulator to fully start
+		 		input_cmd(p, "ps")
+		 		wait_start(p)
+			else:
+				print 'kill existing emulator first!'
+				return
+	
+			# go over every file in APP_PATH, install the app, run it in emulator to analyze and then uninstall the app
+		 	for dirname, dirnames, filenames in os.walk(APP_PATH):
+				for filename in filenames:
+					file_path = os.path.join(dirname, filename)
+					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
+					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    					(output, err) = proc_install.communicate()
+					print output
+			
+					# delete apk file
+					os.remove(file_path)	
+					
+					# after installation, load the plugin
+ 					input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
+	
+					# get package name of the app and hook the process
+					packageName = subprocess.check_output(['/unpackerAutoTestingScripts/getPackageNameFromApk.sh',file_path])
+					packageName = packageName[:-1]
+					cmd = "do_hookapitests {}".format(packageName)
+					input_cmd(p, cmd)
 
-				# delete apk file
-				os.remove(file_path)	
+					# launch the app
+					cmd = "/unpackerAutoTestingScripts/launch_KillApp.sh {} 1".format(file_path)
+					proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					(output, err) = proc_launch.communicate()
+					print output
+	
+					# let the app execute for certain time if it is successfully launched
+					time.sleep(5)
+					check_ret = checkProcess(p, packageName)
+					if check_ret == 1:				
+						time.sleep(EXECUTION_TIME)
+	
+					# unload the plugin and uninstall the app
+					input_cmd(p, "unload_plugin")
+			
+					# clean up the app
+					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
+					proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					(output, err) = proc_uninstall.communicate()
+					print output
+	
+					# move the result files into a specific folder
+					result_path_new = RESULT_PATH + filename
+					os.mkdir(result_path_new)
+					moveAllFiles(TEMP_RESULT_PATH, result_path_new)
 				
-				# move the result files into a specific folder
-				result_path_new = RESULT_PATH + filename
-				os.mkdir(result_path_new)
-				moveAllFiles(TEMP_RESULT_PATH, result_path_new)
-				
-				
-	except IOError as e:
-		print "I/O error({0}): {1}".format(e.errno, e.strerror)
-	except:
-		print "Unexpected error:", sys.exc_info()[0]
-		raise
+		except:
+			continue
 
 
 if __name__ == '__main__':
