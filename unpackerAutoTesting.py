@@ -17,7 +17,7 @@ TEMP_RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art
 RESULT_PATH = "/results/"
 APP_PATH = "/test_apps/"
 
-EXECUTION_TIME = 500
+EXECUTION_TIME = 600
 
 ###CONFIG END#####
 
