@@ -168,11 +168,11 @@ def main():
 					moveAllFiles(TEMP_RESULT_PATH, result_path_new)
 		except:
 			# clean up the app
-			cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
+			cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(curr_file)
 			proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			(output, err) = proc_uninstall.communicate()
 			print output
-			os.remove(file_path)
+			os.remove(curr_file)
 			continue
 
 
