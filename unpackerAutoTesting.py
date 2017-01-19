@@ -21,6 +21,10 @@ EXECUTION_TIME = 1000
 
 ###CONFIG END#####
 
+
+curr_file = ""
+
+
 # Given one directory, delete all its files and subdirectories
 def cleanDir(path):
 	for root, dirs, files in os.walk(path):
@@ -118,14 +122,12 @@ def main():
 		 	for dirname, dirnames, filenames in os.walk(APP_PATH):
 				for filename in filenames:
 					file_path = os.path.join(dirname, filename)
+					curr_file = file_path
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
 					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     					(output, err) = proc_install.communicate()
 					print output
 			
-					# delete apk file
-					os.remove(file_path)	
-					
 					# after installation, load the plugin
  					input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
 	
@@ -134,6 +136,7 @@ def main():
 					packageName = packageName[:-1]
 					cmd = "do_hookapitests {}".format(packageName)
 					input_cmd(p, cmd)
+					
 
 					# launch the app
 					cmd = "/unpackerAutoTestingScripts/launch_KillApp.sh {} 1".format(file_path)
@@ -155,13 +158,21 @@ def main():
 					proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_uninstall.communicate()
 					print output
+					
+					# delete apk file after getting the packageName
+					os.remove(file_path)	
 	
 					# move the result files into a specific folder
 					result_path_new = RESULT_PATH + filename
 					os.mkdir(result_path_new)
 					moveAllFiles(TEMP_RESULT_PATH, result_path_new)
-				
 		except:
+			# clean up the app
+			cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
+			proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			(output, err) = proc_uninstall.communicate()
+			print output
+			os.remove(file_path)
 			continue
 
 
