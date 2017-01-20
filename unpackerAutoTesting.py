@@ -176,6 +176,8 @@ def main():
 					os.mkdir(result_path_new)
 					moveAllFiles(TEMP_RESULT_PATH, result_path_new)
 		except:
+			print "{} caused a crash!".format(curr_file)
+			crashed = True
 			continue
 
 
