@@ -22,6 +22,8 @@ EXECUTION_TIME = 1000
 ###CONFIG END#####
 
 
+# added for cleanup when emulator crashes
+crashed = False
 curr_file = ""
 
 
@@ -52,7 +54,7 @@ def input_cmd(p, cmd):
 			s = p.stdout.read() 
  		except Exception, e:
 			continue 
-		print s 
+		#print s 
 		if "unknown command: 'MARK'" in s: 
 			break
 
@@ -88,7 +90,7 @@ def checkProcess(proc, name):
 		return 0
 	if "unknown command: 'MARK'" in s:
 		if name in s:
-			print "app launched"
+			#print "app launched"
 			return 1
 	return 0
 
@@ -101,7 +103,6 @@ def main():
 		try:
 			pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
         		if not 'emulator' in pl:
-			
 				# move all system image files to the destination folder in order to run multiple docker containers in parallel
 				moveAllFiles(SYS_DIR_SRC_PATH, SYS_DIR_PATH)
 	
@@ -114,6 +115,14 @@ def main():
 				# wait for the emulator to fully start
 		 		input_cmd(p, "ps")
 		 		wait_start(p)
+				
+				if crashed:
+					crashed = False
+					# clean up the app
+					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(os.path.join(APP_PATH, curr_file))
+					proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					(output, err) = proc_uninstall.communicate()
+					os.rename(os.path.join(APP_PATH, curr_file), os.path.join(RESULT_PATH, curr_file))
 			else:
 				print 'kill existing emulator first!'
 				return
@@ -122,11 +131,11 @@ def main():
 		 	for dirname, dirnames, filenames in os.walk(APP_PATH):
 				for filename in filenames:
 					file_path = os.path.join(dirname, filename)
-					curr_file = file_path
+					curr_file = filename
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
 					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     					(output, err) = proc_install.communicate()
-					print output
+					#print output
 			
 					# after installation, load the plugin
  					input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
@@ -142,7 +151,7 @@ def main():
 					cmd = "/unpackerAutoTestingScripts/launch_KillApp.sh {} 1".format(file_path)
 					proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_launch.communicate()
-					print output
+					#print output
 	
 					# let the app execute for certain time if it is successfully launched
 					time.sleep(5)
@@ -157,7 +166,7 @@ def main():
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
 					proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_uninstall.communicate()
-					print output
+					#print output
 					
 					# delete apk file after getting the packageName
 					os.remove(file_path)	
@@ -167,12 +176,6 @@ def main():
 					os.mkdir(result_path_new)
 					moveAllFiles(TEMP_RESULT_PATH, result_path_new)
 		except:
-			# clean up the app
-			cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(curr_file)
-			proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			(output, err) = proc_uninstall.communicate()
-			print output
-			os.remove(curr_file)
 			continue
 
 
