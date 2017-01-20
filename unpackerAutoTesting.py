@@ -17,7 +17,7 @@ TEMP_RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art
 RESULT_PATH = "/results/"
 APP_PATH = "/test_apps/"
 
-EXECUTION_TIME = 1000
+EXECUTION_TIME = 20
 
 ###CONFIG END#####
 
@@ -135,7 +135,7 @@ def main():
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
 					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     					(output, err) = proc_install.communicate()
-					#print output
+					print output
 			
 					# after installation, load the plugin
  					input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
@@ -175,7 +175,7 @@ def main():
 					result_path_new = RESULT_PATH + filename
 					os.mkdir(result_path_new)
 					moveAllFiles(TEMP_RESULT_PATH, result_path_new)
-		except:
+		except IOError as e:
 			print "{} caused a crash!".format(curr_file)
 			crashed = True
 			continue
