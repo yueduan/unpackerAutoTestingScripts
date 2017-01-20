@@ -119,6 +119,7 @@ def main():
 				if crashed:
 					crashed = False
 					# clean up the app
+					print 'cleaning up'
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(os.path.join(APP_PATH, curr_file))
 					proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_uninstall.communicate()
@@ -132,6 +133,7 @@ def main():
 				for filename in filenames:
 					file_path = os.path.join(dirname, filename)
 					curr_file = filename
+					print "installing {}".format(file_path)
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
 					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     					(output, err) = proc_install.communicate()
