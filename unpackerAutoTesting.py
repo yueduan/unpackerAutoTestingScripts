@@ -17,7 +17,7 @@ TEMP_RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art
 RESULT_PATH = "/results/"
 APP_PATH = "/test_apps/"
 
-EXECUTION_TIME = 20
+EXECUTION_TIME = 1000
 
 ###CONFIG END#####
 
@@ -97,6 +97,8 @@ def checkProcess(proc, name):
 
 
 def main():
+	global crashed
+	global curr_file
 	shutil.copyfile("/unpackerAutoTestingScripts/libunpacker.so", PLUGIN_PATH)
 	cleanDir(RESULT_PATH)
 	while ((os.listdir(APP_PATH) != [])):
