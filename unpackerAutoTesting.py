@@ -139,7 +139,7 @@ def main():
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
 					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     					(output, err) = proc_install.communicate()
-					print output
+					#print output
 			
 					# after installation, load the plugin
  					input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
