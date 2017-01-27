@@ -69,7 +69,7 @@ def wait_start(proc):
 		except Exception, e:
 			continue
 		if "unknown command: 'MARK'" in s:
-			if "com.android.providers.calendar" in s:
+			if "com.android.calendar" in s:
 				break
 			else:
 				proc.stdin.write("ps\n")
