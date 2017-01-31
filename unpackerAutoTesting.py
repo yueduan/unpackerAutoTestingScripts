@@ -17,7 +17,7 @@ TEMP_RESULT_PATH = "/home/yduan/yueduan/android-5.0.0_r3/external/droidscope_art
 RESULT_PATH = "/results/"
 APP_PATH = "/test_apps/"
 
-EXECUTION_TIME = 1000
+EXECUTION_TIME = 600
 
 ###CONFIG END#####
 
@@ -138,8 +138,10 @@ def main():
 					print "installing {}".format(file_path)
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
 					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    					(output, err) = proc_install.communicate()
-					#print output
+    					#(output, err) = proc_install.communicate()
+					time.sleep(10)
+					if proc_install.poll() is None:
+						proc_install.kill()
 			
 					# after installation, load the plugin
  					input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
