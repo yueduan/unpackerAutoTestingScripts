@@ -137,7 +137,7 @@ def main():
 					curr_file = filename
 					print "installing {}".format(file_path)
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
-					proc_install = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     					(output, err) = proc_install.communicate()
 			
 					# after installation, load the plugin
@@ -152,7 +152,7 @@ def main():
 
 					# launch the app
 					cmd = "/unpackerAutoTestingScripts/launch_KillApp.sh {} 1".format(file_path)
-					proc_launch = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_launch.communicate()
 					print output
 	
@@ -167,7 +167,7 @@ def main():
 			
 					# clean up the app
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
-					proc_uninstall = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_uninstall.communicate()
 					#print output
 					
