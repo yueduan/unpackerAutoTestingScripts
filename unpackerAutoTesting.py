@@ -137,11 +137,8 @@ def main():
 					curr_file = filename
 					print "installing {}".format(file_path)
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 1".format(file_path)
-					proc_install = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    					#(output, err) = proc_install.communicate()
-					time.sleep(10)
-					if proc_install.poll() is None:
-						proc_install.kill()
+					proc_install = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    					(output, err) = proc_install.communicate()
 			
 					# after installation, load the plugin
  					input_cmd(p, "load_plugin {plugin}".format(plugin=PLUGIN_PATH))
@@ -155,9 +152,9 @@ def main():
 
 					# launch the app
 					cmd = "/unpackerAutoTestingScripts/launch_KillApp.sh {} 1".format(file_path)
-					proc_launch = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					proc_launch = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_launch.communicate()
-					#print output
+					print output
 	
 					# let the app execute for certain time if it is successfully launched
 					time.sleep(5)
@@ -170,7 +167,7 @@ def main():
 			
 					# clean up the app
 					cmd = "/unpackerAutoTestingScripts/install_uninstall.sh {} 2".format(file_path)
-					proc_uninstall = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					proc_uninstall = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 					(output, err) = proc_uninstall.communicate()
 					#print output
 					
