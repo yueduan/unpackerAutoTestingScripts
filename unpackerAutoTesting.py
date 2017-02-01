@@ -100,7 +100,7 @@ def main():
 	global crashed
 	global curr_file
 	shutil.copyfile("/unpackerAutoTestingScripts/libunpacker.so", PLUGIN_PATH)
-	cleanDir(RESULT_PATH)
+	#cleanDir(RESULT_PATH)
 	while ((os.listdir(APP_PATH) != [])):
 		try:
 			pl = subprocess.Popen(['ps', '-U', '0'], stdout=subprocess.PIPE).communicate()[0]
